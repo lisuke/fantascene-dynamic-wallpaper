@@ -158,11 +158,35 @@ INCLUDEPATH += $$PWD/ini
 INCLUDEPATH += $$PWD/download
 INCLUDEPATH += $$PWD/media
 unix {
-# No matter the build type is release or debug, we always need to generate the qm file.
-TRANSLATIONS = $$files($$PWD/translations/*.ts)
-for(tsfile, TRANSLATIONS) {
-    qmfile = $$replace(tsfile, .ts$, .qm)
-    system(lrelease $$tsfile -qm $$qmfile) | error("Failed to lrelease")
+# 定义 lrelease 工具路径的检测逻辑
+LRELEASE = lrelease
+# 第一步：检查系统环境中的 lrelease 是否可用
+system($$LRELEASE -version > /dev/null 2>&1) {
+    message("Found lrelease in system PATH: $$LRELEASE")
+} else {
+    # 第二步：检查 Qt6 自带的 lrelease 绝对路径
+    QT6_LRELEASE = /usr/lib/qt6/bin/lrelease
+    exists($$QT6_LRELEASE) {
+        LRELEASE = $$QT6_LRELEASE
+        message("Found lrelease at Qt6 path: $$LRELEASE")
+    } else {
+        # 第三步：都不存在，标记为不可用
+        LRELEASE =
+        message("lrelease not found, skipping translation compilation")
+    }
+}
+
+# 只有找到 lrelease 时才执行翻译文件编译
+!isEmpty(LRELEASE) {
+    # 假设你的翻译文件是 *.ts，这里替换成你实际的 ts 文件列表
+    TRANSLATIONS += translations/your_app_zh_CN.ts \
+                    translations/your_app_en.ts
+
+    # 执行 lrelease 编译 ts 文件为 qm 文件
+    for(tsfile, TRANSLATIONS) {
+        qmfile = $$replace(tsfile, \\.ts$$, .qm)
+        system($$LRELEASE $$tsfile -qm $$qmfile)
+    }
 }
 }
 
