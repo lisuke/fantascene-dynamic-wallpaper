@@ -88,8 +88,11 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
     QFile outFile(logFileName);
     outFile.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream textStream(&outFile);
+#if QT_VERSION_MAJOR == 5
+    textStream << txt << endl;
+#else
     textStream << txt << Qt::endl;
-
+#endif
     // 删除10天前的日志文件
     QDir logDir(logFolder);
     QStringList filters;

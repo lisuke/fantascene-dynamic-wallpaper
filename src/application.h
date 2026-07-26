@@ -42,7 +42,7 @@ const QString PIC_DIR_PATH =   QDir::homePath() +
 
 #define dApp (static_cast<Application*>(QCoreApplication::instance()))
 
-#define APP_VERSION "2.1.2"
+#define APP_VERSION "2.1.3"
 
 #define MAINWINDOWWIDTH 1024
 #define MAINWINDOWHEIGHT 700
